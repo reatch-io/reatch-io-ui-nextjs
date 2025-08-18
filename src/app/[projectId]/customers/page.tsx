@@ -8,6 +8,7 @@ import api from "@/api/auth/app-api";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import { PaginationState } from "@tanstack/react-table";
+import { DataTableSkeleton } from "@/components/ui/data-table-skeleton";
 
 export default function CustomersPage() {
     const [data, setData] = useState<Customer[]>([])
@@ -34,7 +35,7 @@ export default function CustomersPage() {
     }, [search]);
 
     useEffect(() => {
-        api.get(`http://localhost:9090/api/customers?page=${page}&size=${pageSize}&search=${search}`, {
+        api.get(`http://localhost:9090/api/customers?page=${page}&size=${pageSize}&search=${debouncedSearch}`, {
             headers: {
                 "X-Project-ID": "123456"
             }
@@ -77,11 +78,15 @@ export default function CustomersPage() {
                     
                 </div>
                 <div style={{ height: "calc(-21.8rem + 100vh)" }}>
-                    <CustomerTableClient
-                        data={data}
-                        totalElements={totalElements}
-                        onPaginationChange={handlePaginationChange}
-                    />
+                    {isLoading ? (
+                        <DataTableSkeleton/>
+                    ) : (
+                        <CustomerTableClient
+                            data={data}
+                            totalElements={totalElements}
+                            onPaginationChange={handlePaginationChange}
+                        />
+                    )}
                 </div>
             </div>
         </div>
