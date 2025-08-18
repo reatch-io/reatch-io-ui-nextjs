@@ -61,12 +61,6 @@ type Project = {
     name: string;
 };
 
-const user = {
-    name: "Jane Doe",
-    email: "jane.doe@example.com",
-    avatarUrl: "", // or a real image URL
-}
-
 
 export function AppSidebar() {
     const [projects, setProjects] = useState<Project[]>([])
@@ -74,7 +68,7 @@ export function AppSidebar() {
     const pathname = usePathname()
     const router = useRouter()
     const { user } = useUser();
-    const [userRegisted, setUserRegisted] = useState<Boolean>();
+    const [userRegisted, setUserRegisted] = useState<boolean>();
 
     useEffect(() => {
         if (user) {

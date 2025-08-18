@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import api from "@/api/auth/app-api";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
+import { PaginationState } from "@tanstack/react-table";
 
 export default function CustomersPage() {
     const [data, setData] = useState<Customer[]>([])
@@ -43,7 +44,7 @@ export default function CustomersPage() {
         })
     }, [page, pageSize, debouncedSearch]);
 
-    const handlePaginationChange = (pagination: any) => {
+    const handlePaginationChange = (pagination: PaginationState) => {
         setPage(pagination.pageIndex);
         setPageSize(pagination.pageSize);
     }
