@@ -1,22 +1,11 @@
 "use client"
 
-import { Badge } from "@/components/ui/badge"
 import { CustomerInfo } from "@/components/ui/customer-info"
 import { CustomerSegment } from "@/components/ui/customer-segment"
 import { CustomerStatus } from "@/components/ui/customer-status"
+import { Customer } from "@/models/customer"
 import { ColumnDef } from "@tanstack/react-table"
 
-export type Customer = {
-  id: string
-  firstName: string
-  lastName: string
-  email: string
-  createdAt: string
-  lastActivity: string
-  segment: string
-  status: "Active" | "Inactive"
-  totalSpent: string
-}
 
 export const customersColumns: ColumnDef<Customer>[] = [
   {

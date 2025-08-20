@@ -1,14 +1,17 @@
 'use client'
 
 import { InfoBox } from "@/components/ui/info-box";
-import { Customer } from "./customers-columns";
 import { CustomerTableClient } from "./customers-list";
 import { useEffect, useState } from "react";
 import api from "@/api/auth/app-api";
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
+import { Loader2, UploadIcon } from "lucide-react";
 import { PaginationState } from "@tanstack/react-table";
 import { DataTableSkeleton } from "@/components/ui/data-table-skeleton";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { Customer } from "@/models/customer";
 
 export default function CustomersPage() {
     const [data, setData] = useState<Customer[]>([])
@@ -18,9 +21,10 @@ export default function CustomersPage() {
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
 
-    const pathname = window.location.pathname;
-    const projectId = pathname.split("/")[2];
+    const params = useParams();
+    const { projectId } = params as { projectId: string };
 
     useEffect(() => {
         setIsLoading(true);
@@ -37,7 +41,7 @@ export default function CustomersPage() {
     useEffect(() => {
         api.get(`http://localhost:9090/api/customers?page=${page}&size=${pageSize}&search=${debouncedSearch}`, {
             headers: {
-                "X-Project-ID": "123456"
+                "X-Project-ID": projectId
             }
         }).then((response) => {
             setData(response.data.content)
@@ -50,10 +54,30 @@ export default function CustomersPage() {
         setPageSize(pagination.pageSize);
     }
 
+    function handleRowClick(row: Customer): void {
+        router.push(`customers/${row.systemId}`);
+    }
+
     return (
         <div>
-            <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Customers</h3>
-            <p className="leading-7">Manage your customer database and import new contacts.</p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Customers</h3>
+                    <p className="leading-7">Manage your customer database and import new contacts.</p>
+                </div>
+                <div className="flex gap-2">
+                    <Link href={`customers/import`} passHref>
+                        <Button variant="outline">
+                            <UploadIcon /> Import CSV
+                        </Button>
+                    </Link>
+                    <Link href={`customers/add`} passHref>
+                        <Button className="bg-gradient-primary">
+                            Add customer
+                        </Button>
+                    </Link>
+                </div>
+            </div>
             <div className="flex flex-row gap-4 mt-6 w-full">
                 <InfoBox title="12,847" description="Total Customers"></InfoBox>
                 <InfoBox title="8,923" description="Active Customers" titleClassName="text-green-600"></InfoBox>
@@ -64,10 +88,10 @@ export default function CustomersPage() {
                 <div className="flex items-center justify-between mb-4">
                     <h4 className="flex-1 grow text-lg font-semibold">Customers list</h4>
                     {isLoading && (
-                            <span className="text-gray-400 animate-spin mr-2">
-                                <Loader2 size={18} />
-                            </span>
-                        )}
+                        <span className="text-gray-400 animate-spin mr-2">
+                            <Loader2 size={18} />
+                        </span>
+                    )}
                     <Input
                         type="text"
                         value={search}
@@ -75,16 +99,17 @@ export default function CustomersPage() {
                         placeholder="Search customers..."
                         className="border rounded px-3 py-2 text-sm w-64"
                     />
-                    
+
                 </div>
                 <div style={{ height: "calc(-21.8rem + 100vh)" }}>
                     {isLoading ? (
-                        <DataTableSkeleton/>
+                        <DataTableSkeleton />
                     ) : (
                         <CustomerTableClient
                             data={data}
                             totalElements={totalElements}
-                            onPaginationChange={handlePaginationChange}
+                            onPaginationChangeAction={handlePaginationChange}
+                            onRowClickAction={handleRowClick}
                         />
                     )}
                 </div>

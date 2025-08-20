@@ -28,6 +28,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
   totalElements: number
   onPaginationChange: (pagination: PaginationState) => void
+  onRowClick?: (row: TData) => void
 }
 
 export function DataTable<TData, TValue>({
@@ -35,6 +36,7 @@ export function DataTable<TData, TValue>({
   data,
   totalElements,
   onPaginationChange,
+  onRowClick
 }: DataTableProps<TData, TValue>) {
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -89,6 +91,12 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="cursor-pointer"
+                  onClick={() => {
+                    if (onRowClick) {
+                      onRowClick(row.original)
+                    }
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
