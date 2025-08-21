@@ -1,6 +1,5 @@
 import axios from "axios";
 import { getAccessToken } from "@auth0/nextjs-auth0";
-import { redirect } from "next/dist/server/api-utils";
 
 const api = axios.create();
 

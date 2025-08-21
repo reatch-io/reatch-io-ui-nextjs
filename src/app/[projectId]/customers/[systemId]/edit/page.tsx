@@ -58,7 +58,7 @@ export default function AddCustomerPage() {
             setUpdated(true);
             form.reset();
         })
-        .catch((error) => {
+        .catch(() => {
             toast.error("Failed to update customer.");
             setUpdated(false);
         })
@@ -73,7 +73,7 @@ export default function AddCustomerPage() {
         .then((response) => {
             form.reset(response.data);
         })
-        .catch((error) => {
+        .catch(() => {
             toast.error("Failed to fetch customer data.");
         });
     }, [systemId, updated]);

@@ -57,7 +57,7 @@ export default function AddCustomerPage() {
             toast.success("Customer added successfully!");
             form.reset();
         })
-        .catch((error) => {
+        .catch(() => {
             toast.error("Failed to add customer.");
         })
     }

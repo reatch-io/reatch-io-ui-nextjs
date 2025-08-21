@@ -204,11 +204,11 @@ export function AppSidebar() {
                             </div>
                         </div>
                         <div className="p-4 border-t">
-                            <a
+                            <Link
                                 href="/auth/logout"
                                 className="block w-full text-left text-sm text-muted-foreground hover:underline">
                                 Logout
-                            </a>
+                            </Link>
                         </div>
                     </SidebarMenuItem>
                 </SidebarMenu>
