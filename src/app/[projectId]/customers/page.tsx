@@ -1,69 +1,41 @@
-'use client'
+"use client";
 
+import { useEffect, useState } from "react";
 import { InfoBox } from "@/components/ui/info-box";
 import { CustomerTableClient } from "./customers-list";
-import { useEffect, useState } from "react";
-import api from "@/api/auth/app-api";
-import { Input } from "@/components/ui/input";
-import { Loader2, UploadIcon } from "lucide-react";
-import { PaginationState } from "@tanstack/react-table";
-import { DataTableSkeleton } from "@/components/ui/data-table-skeleton";
+import { UploadIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { Customer } from "@/models/customer";
+import api from "@/api/auth/app-api";
+import { CustomersInsights } from "@/models/customer";
+import { useParams } from "next/navigation";
 
 export default function CustomersPage() {
-    const [data, setData] = useState<Customer[]>([])
-    const [totalElements, setTotalElements] = useState(0)
-    const [page, setPage] = useState(0);
-    const [pageSize, setPageSize] = useState(20);
-    const [search, setSearch] = useState("");
-    const [debouncedSearch, setDebouncedSearch] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
-    const router = useRouter();
-
+    const [insights, setInsights] = useState<CustomersInsights>();
     const params = useParams();
     const { projectId } = params as { projectId: string };
 
     useEffect(() => {
-        setIsLoading(true);
-        const handler = setTimeout(() => {
-            setDebouncedSearch(search);
-            setIsLoading(false);
-        }, 2000);
-        return () => {
-            clearTimeout(handler);
-            setIsLoading(false);
-        };
-    }, [search]);
-
-    useEffect(() => {
-        api.get(`http://localhost:9090/api/customers?page=${page}&size=${pageSize}&search=${debouncedSearch}`, {
-            headers: {
-                "X-Project-ID": projectId
-            }
-        }).then((response) => {
-            setData(response.data.content)
-            setTotalElements(response.data.totalElements)
-        })
-    }, [page, pageSize, debouncedSearch]);
-
-    const handlePaginationChange = (pagination: PaginationState) => {
-        setPage(pagination.pageIndex);
-        setPageSize(pagination.pageSize);
-    }
-
-    function handleRowClick(row: Customer): void {
-        router.push(`customers/${row.systemId}`);
-    }
+        api
+            .get("/api/customers/insights", {
+                headers: {
+                    "X-Project-ID": projectId
+                }
+            })
+            .then((res) => setInsights(res.data))
+            .catch(() => { });
+    }, []);
 
     return (
         <div>
             <div className="flex items-center justify-between">
                 <div>
-                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Customers</h3>
-                    <p className="leading-7">Manage your customer database and import new contacts.</p>
+                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+                        Customers
+                    </h3>
+                    <p className="leading-7">
+                        Manage your customer database and import new contacts.
+                    </p>
                 </div>
                 <div className="flex gap-2">
                     <Link href={`customers/import`} passHref>
@@ -72,48 +44,32 @@ export default function CustomersPage() {
                         </Button>
                     </Link>
                     <Link href={`customers/add`} passHref>
-                        <Button className="bg-gradient-primary">
-                            Add customer
-                        </Button>
+                        <Button className="bg-gradient-primary">Add customer</Button>
                     </Link>
                 </div>
             </div>
             <div className="flex flex-row gap-4 mt-6 w-full">
-                <InfoBox title="12,847" description="Total Customers"></InfoBox>
-                <InfoBox title="8,923" description="Active Customers" titleClassName="text-green-600"></InfoBox>
-                <InfoBox title="2,341" description="New This Month" titleClassName="text-blue-600"></InfoBox>
-                <InfoBox title="3,924" description="Inactive Customers" titleClassName="text-purple-600"></InfoBox>
+                <InfoBox
+                    title={insights?.totalCustomers !== undefined ? String(insights.totalCustomers) : "—"}
+                    description="Total Customers"
+                />
+                <InfoBox
+                    title={insights?.activeCustomers !== undefined ? String(insights.activeCustomers) : "—"}
+                    description="Active Customers"
+                    titleClassName="text-green-600"
+                />
+                <InfoBox
+                    title={insights?.newThisMonth !== undefined ? String(insights.newThisMonth) : "—"}
+                    description="New This Month"
+                    titleClassName="text-blue-600"
+                />
+                <InfoBox
+                    title={insights?.inactiveCustomers !== undefined ? String(insights.inactiveCustomers) : "—"}
+                    description="Inactive Customers"
+                    titleClassName="text-purple-600"
+                />
             </div>
-            <div className="py-10" style={{ height: "calc(-14.7rem + 100vh)", paddingTop: "1.5rem" }}>
-                <div className="flex items-center justify-between mb-4">
-                    <h4 className="flex-1 grow text-lg font-semibold">Customers list</h4>
-                    {isLoading && (
-                        <span className="text-gray-400 animate-spin mr-2">
-                            <Loader2 size={18} />
-                        </span>
-                    )}
-                    <Input
-                        type="text"
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
-                        placeholder="Search customers..."
-                        className="border rounded px-3 py-2 text-sm w-64"
-                    />
-
-                </div>
-                <div style={{ height: "calc(-21.8rem + 100vh)" }}>
-                    {isLoading ? (
-                        <DataTableSkeleton />
-                    ) : (
-                        <CustomerTableClient
-                            data={data}
-                            totalElements={totalElements}
-                            onPaginationChangeAction={handlePaginationChange}
-                            onRowClickAction={handleRowClick}
-                        />
-                    )}
-                </div>
-            </div>
+            <CustomerTableClient />
         </div>
     );
 }

@@ -17,7 +17,7 @@ export default function CustomerDetailsPage() {
   const [ customer, setCustomer ] = useState<Customer>();
 
   useEffect(() => {
-    api.get(`http://localhost:9090/api/customers/${systemId}`, {
+    api.get(`/api/customers/${systemId}`, {
       headers: {
         "X-Project-ID": projectId,
       },

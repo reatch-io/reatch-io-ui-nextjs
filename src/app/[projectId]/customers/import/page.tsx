@@ -45,7 +45,7 @@ export default function ImportCustomersPage() {
 
         setIsUploading(true);
         try {
-            await api.post("http://localhost:9090/api/customers/import", formData, {
+            await api.post("/api/customers/import", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     "X-Project-ID": projectId,
@@ -67,7 +67,7 @@ export default function ImportCustomersPage() {
     }
 
     const fetchHistory = useCallback(() => {
-        api.get(`http://localhost:9090/api/customers/imports?page=${page}&size=${pageSize}`, {
+        api.get(`/api/customers/imports?page=${page}&size=${pageSize}`, {
             headers: {
                 "X-Project-ID": projectId
             }

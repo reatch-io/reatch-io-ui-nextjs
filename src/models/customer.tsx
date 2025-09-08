@@ -25,3 +25,10 @@ export type Customer = {
     attributes: CustomerAttribute[]
     events: CustomerEvent[]
 }
+
+export type CustomersInsights = {
+    totalCustomers: number
+    activeCustomers: number
+    newThisMonth: number
+    inactiveCustomers: number
+}

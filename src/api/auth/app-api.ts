@@ -3,6 +3,8 @@ import { getAccessToken } from "@auth0/nextjs-auth0";
 
 const api = axios.create();
 
+api.defaults.baseURL = process.env.API_BASE_URL || "http://localhost:9090";
+
 api.interceptors.request.use(async (config) => {
   try {
     const accessToken = await getAccessToken();
@@ -18,9 +20,10 @@ api.interceptors.response.use(
   response => response,
   error => {
     if (error.response && error.response.status === 401) {
-      // Redirect to login page
-      alert("Your session has expired. Please log in again.");
-      window.location.href = "/auth/login";
+      setTimeout(() => {
+        alert("Your session has expired. Please log in again.");
+        window.location.href = "/auth/login";
+      }, 0);
     }
     return Promise.reject(error);
   }

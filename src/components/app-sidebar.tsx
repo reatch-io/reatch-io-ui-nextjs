@@ -72,7 +72,7 @@ export function AppSidebar() {
 
     useEffect(() => {
         if (user) {
-            api.post("http://localhost:9090/api/users", {
+            api.post("/api/users", {
                 id: user.sub,
                 username: user.name,
                 email: user.email,
@@ -89,7 +89,7 @@ export function AppSidebar() {
     }, [user]);
 
     useEffect(() => {
-        api.get("http://localhost:9090/api/projects")
+        api.get("/api/projects")
             .then((response) => {
                 const data = response.data;
                 setProjects(data);

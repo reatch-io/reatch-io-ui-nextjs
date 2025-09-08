@@ -47,7 +47,7 @@ export default function AddCustomerPage() {
     })
 
     function onSubmit(data: z.infer<typeof FormSchema>) {
-        api.post("http://localhost:9090/api/customers", data, {
+        api.post("/api/customers", data, {
             headers: {
                 "Content-Type": "application/json",
                 "X-Project-ID": projectId,
