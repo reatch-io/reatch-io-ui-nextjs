@@ -9,7 +9,7 @@ import { DateTimePicker } from "../ui/date-time-picker";
 import { DatePicker } from "../ui/date-picker";
 import { Input } from "../ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select";
-import { Campaign, ScheduledDelivery } from "@/models/campaign";
+import { Campaign, DEFAULT_SCHEDULED_DELIVERY, ScheduledDelivery } from "@/models/campaign";
 import { format } from "date-fns";
 
 const frequencyOptions = [
@@ -38,7 +38,9 @@ const daysOfWeek = [
 export default function ScheduledDeliveryComponent({ campaign }: { campaign: Campaign }) {
     const params = useParams();
     const { projectId, campaignId } = params as { projectId: string; campaignId: string };
-    const [scheduledDelivery, setScheduledDelivery] = useState<ScheduledDelivery>();
+    const [scheduledDelivery, setScheduledDelivery] = useState<ScheduledDelivery>(() =>
+        ({ ...DEFAULT_SCHEDULED_DELIVERY })
+    );
     const [loading, setLoading] = useState(false);
 
     // Load schedule information from API
@@ -49,7 +51,7 @@ export default function ScheduledDeliveryComponent({ campaign }: { campaign: Cam
         )
             .then((response) => {
                 const data = response.data;
-                setScheduledDelivery(data);
+                setScheduledDelivery({ ...DEFAULT_SCHEDULED_DELIVERY, ...(data || {}) });
             })
             .finally(() => {
                 setLoading(false);
@@ -72,9 +74,10 @@ export default function ScheduledDeliveryComponent({ campaign }: { campaign: Cam
 
     function handleSave() {
         setLoading(true);
+        const payload = { ...DEFAULT_SCHEDULED_DELIVERY, ...(scheduledDelivery || {}) };
         api.post(
             `/api/campaigns/${campaignId}/schedule`,
-            scheduledDelivery,
+            payload,
             {
                 headers: { "X-Project-ID": projectId },
             }
@@ -91,13 +94,13 @@ export default function ScheduledDeliveryComponent({ campaign }: { campaign: Cam
     }
 
     // Read values from scheduledDelivery object
-    const frequency = scheduledDelivery?.frequency || "ONCE";
-    const startingDate = scheduledDelivery?.startingDate ? new Date(scheduledDelivery.startingDate) : undefined;
-    const recurrence = scheduledDelivery?.recurrence ?? 1;
-    const endingType = scheduledDelivery?.endingType || "NEVER";
-    const endingDate = scheduledDelivery?.endingDate || "";
-    const endingRecurrence = scheduledDelivery?.endingRecurrence ?? 1;
-    const selectedDays = scheduledDelivery?.selectedDays || [];
+    const frequency = scheduledDelivery?.frequency || DEFAULT_SCHEDULED_DELIVERY.frequency;
+    const startingDate = scheduledDelivery?.startingDate ? new Date(scheduledDelivery.startingDate) : new Date(DEFAULT_SCHEDULED_DELIVERY.startingDate);
+    const recurrence = scheduledDelivery?.recurrence ?? DEFAULT_SCHEDULED_DELIVERY.recurrence;
+    const endingType = scheduledDelivery?.endingType || DEFAULT_SCHEDULED_DELIVERY.endingType;
+    const endingDate = scheduledDelivery?.endingDate || DEFAULT_SCHEDULED_DELIVERY.endingDate;
+    const endingRecurrence = scheduledDelivery?.endingRecurrence ?? DEFAULT_SCHEDULED_DELIVERY.endingRecurrence;
+    const selectedDays = scheduledDelivery?.selectedDays || DEFAULT_SCHEDULED_DELIVERY.selectedDays;
 
     // Helper to generate summary text (memoized for performance)
     const summaryText = useMemo(() => {

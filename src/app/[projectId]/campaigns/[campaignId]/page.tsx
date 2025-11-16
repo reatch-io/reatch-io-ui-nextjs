@@ -4,24 +4,20 @@ import api from "@/api/auth/app-api";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Campaign } from "@/models/campaign";
 import CampaignDelivery from "@/components/campaigns/campaign-delivery";
 import CampaignChannels from "@/components/campaigns/campaign-channels";
 import TargetAudience from "@/components/campaigns/target-audience";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { MoreVertical } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import CampaignSummary from "@/components/campaigns/campaign-summary";
 
 
 const steps = [
     "Compose messages",
     "Schedule Delivery",
     "Target audiences",
-    "Preview",
 ];
 
 function Stepper({ currentStep, onStepClick }: { currentStep: number; onStepClick: (idx: number) => void }) {
@@ -193,9 +189,6 @@ export default function CampaignPage() {
             )}
             {currentStep === 2 && (
                 <TargetAudience />
-            )}
-            {currentStep === 3 && (
-                <CampaignSummary />
             )}
         </div>
     );

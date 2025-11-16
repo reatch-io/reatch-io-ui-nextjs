@@ -35,7 +35,7 @@ export default function CampaignDelivery() {
     const params = useParams();
     const { projectId, campaignId } = params as { projectId: string; campaignId: string };
     const [campaign, setCampaign] = useState<Campaign>();
-    
+
 
     useEffect(() => {
         api.get(`/api/campaigns/${campaignId}`, {
@@ -62,8 +62,7 @@ export default function CampaignDelivery() {
                                     ? "border-primary bg-primary/10 text-primary font-semibold"
                                     : "border-gray-200 bg-white text-gray-700 hover:border-primary"}
                             `}
-                            onClick={() => campaign!.deliveryType = type.value as DeliveryType}
-                        >
+                            onClick={() => setCampaign(prev => prev ? { ...prev, deliveryType: type.value as DeliveryType } : prev)}                        >
                             {type.icon}
                             <div>{type.label}</div>
                             <div className="text-xs text-muted-foreground mt-1">

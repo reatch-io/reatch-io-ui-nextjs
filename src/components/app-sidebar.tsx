@@ -1,6 +1,6 @@
 'use client'
 
-import { BarChart2, Home, Layers, Send, Settings, Users } from "lucide-react"
+import { BarChart2, Globe, Home, Layers, Send, Settings, Users } from "lucide-react"
 
 import {
     Sidebar,
@@ -43,6 +43,11 @@ const items = [
         title: "Campaigns",
         url: "campaigns",
         icon: Send,
+    },
+    {
+        title: "Domains",
+        url: "domains",
+        icon: Globe,
     },
     {
         title: "Analytics",

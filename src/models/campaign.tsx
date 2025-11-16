@@ -27,7 +27,7 @@ export type CampaignsInsights = {
 export type DeliveryType = "SCHEDULED" | "ACTION_BASED" | "API_TRIGGERED";
 
 export type ScheduledDelivery = {
-    id: string;
+    scheduleId: string;
     frequency: "ONCE" | "DAILY" | "WEEKLY" | "MONTHLY";
     startingDate: string;
     recurrence: number;
@@ -36,4 +36,15 @@ export type ScheduledDelivery = {
     endingRecurrence: number;
     selectedDays: string[];
 }
+
+export const DEFAULT_SCHEDULED_DELIVERY: ScheduledDelivery = {
+    scheduleId: "",
+    frequency: "ONCE",
+    startingDate: new Date().toISOString(),
+    recurrence: 1,
+    endingType: "NEVER",
+    endingDate: "",
+    endingRecurrence: 1,
+    selectedDays: [],
+};
 

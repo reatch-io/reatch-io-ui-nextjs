@@ -27,7 +27,7 @@ export function TagsInput({
 
     return (
         <div
-            className="flex flex-wrap items-center gap-1 border px-2 py-1 w-40 grow min-h-[38px]"
+            className="flex flex-wrap items-center gap-1 border px-2 py-1 w-40 grow min-h-[38px] w-full"
             style={{ borderRadius: 8, fontSize: 14, background: disabled ? "#f3f4f6" : undefined }}
         >
             {value.map((tag, i) => (

@@ -16,7 +16,7 @@ const channelOptions = [
 
 const channelApis = {
     email: (projectId: string, campaignId: string) =>
-        api.get(`/api/email/campaigns/${campaignId}`, { headers: { "X-Project-ID": projectId } }),
+        api.get(`/api/email/${campaignId}`, { headers: { "X-Project-ID": projectId } }),
     whatsapp: (projectId: string, campaignId: string) =>
         api.get(`/api/whatsapp/campaigns/${campaignId}`, { headers: { "X-Project-ID": projectId } }),
     push: (projectId: string, campaignId: string) =>
@@ -44,7 +44,7 @@ export default function CampaignChannels() {
                 .then(res => {
                     setChannelStatus((prev) => ({
                         ...prev,
-                        [ch.value]: { loading: false, configured: !!res.data?.configured }
+                        [ch.value]: { loading: false, configured: true }
                     }));
                 })
                 .catch(() => {
