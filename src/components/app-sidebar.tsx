@@ -50,6 +50,11 @@ const items = [
         icon: Globe,
     },
     {
+        title: "Whatsapp",
+        url: "whatsapp",
+        icon: Send,
+    },
+    {
         title: "Analytics",
         url: "analytics",
         icon: BarChart2,

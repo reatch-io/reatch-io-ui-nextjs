@@ -18,6 +18,9 @@ export default async function DashboardLayout({
 
   return (
     <html lang="en">
+      <head>
+        <title>Reatch.io - Next Generation Marketing Platform</title>
+      </head>
       <body>
           <SidebarProvider>
             <AppSidebar />
