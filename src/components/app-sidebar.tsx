@@ -1,6 +1,6 @@
 'use client'
 
-import { BarChart2, Globe, Home, Layers, Send, Settings, Users } from "lucide-react"
+import { BarChart2, Globe, Home, Layers, MessageSquare, Send, Settings, Users } from "lucide-react"
 
 import {
     Sidebar,
@@ -53,6 +53,11 @@ const items = [
         title: "Whatsapp",
         url: "whatsapp",
         icon: Send,
+    },
+    {
+        title: "Whatsapp Templates",
+        url: "whatsapp-templates",
+        icon: MessageSquare,
     },
     {
         title: "Analytics",

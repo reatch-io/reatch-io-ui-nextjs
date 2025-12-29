@@ -18,7 +18,7 @@ const channelApis = {
     email: (projectId: string, campaignId: string) =>
         api.get(`/api/email/${campaignId}`, { headers: { "X-Project-ID": projectId } }),
     whatsapp: (projectId: string, campaignId: string) =>
-        api.get(`/api/whatsapp/campaigns/${campaignId}`, { headers: { "X-Project-ID": projectId } }),
+        api.get(`/api/whatsapp/templates/campaigns/${campaignId}`, { headers: { "X-Project-ID": projectId } }),
     push: (projectId: string, campaignId: string) =>
         api.get(`/api/push/campaigns/${campaignId}`, { headers: { "X-Project-ID": projectId } }),
 };

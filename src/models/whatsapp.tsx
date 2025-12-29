@@ -26,3 +26,29 @@ export type Account = {
     createdAt?: string;
     status?: string | null;
 };
+
+export type WhatsAppTemplate = {
+    id: string;
+    name: string;
+    category: string;
+    status: string;
+    language: string;
+    type: TemplateType;
+    body: string;
+    variables: string[];
+    media: string[];
+    actions: ActionDto[];
+    externalTemplateId: string;
+    createdAt: string;
+};
+
+export type TemplateType = "TEXT" | "MEDIA" | "CALL_TO_ACTION";
+
+export type ActionDto = {
+    type: ActionType,
+    title: string,
+    url: string | null,
+    phone: string | null,
+    code: string | null
+};
+export type ActionType = "URL" | "PHONE_NUMBER" | "COPY_CODE";
