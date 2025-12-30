@@ -3,7 +3,7 @@ import { getAccessToken } from "@auth0/nextjs-auth0";
 
 const api = axios.create();
 
-api.defaults.baseURL = process.env.API_BASE_URL || "http://localhost:9090";
+api.defaults.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 api.interceptors.request.use(async (config) => {
   try {
