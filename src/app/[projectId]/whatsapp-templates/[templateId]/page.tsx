@@ -316,7 +316,18 @@ export default function WhatsappTemplatePage() {
                         <strong>Important:</strong> This template must be approved by WhatsApp before it can be used in campaigns. 
                         {templateStatus === "unsubmitted" && " Please submit it for approval first."}
                         {templateStatus === "submitted" && " Your template is currently under review."}
+                        {templateStatus === "pending" && " Your template is pending review by WhatsApp."}
                         {templateStatus === "rejected" && " Your template was rejected. Please create a new one and make the required changes before submit."}
+                    </AlertDescription>
+                </Alert>
+            )}
+
+            {/* Important Note Alert */}
+            {templateStatus !== "approved" && (
+                <Alert className="mt-6 border-blue-200 bg-blue-50">
+                    <AlertCircle className="h-4 w-4 text-blue-600" />
+                    <AlertDescription className="text-blue-800">
+                        <strong>Important:</strong> WhatsApp approval typically takes 15 minutes to 24 hours.
                     </AlertDescription>
                 </Alert>
             )}
