@@ -192,16 +192,21 @@ export default function WhatsappTemplatePage() {
     const getStatusBadge = (status: string | null) => {
         if (!status) return null;
 
-        const statusConfig: Record<string, { variant: "default" | "secondary" | "destructive" | "outline", label: string }> = {
-            unsubmitted: { variant: "secondary", label: "Unsubmitted" },
-            submitted: { variant: "outline", label: "Submitted" },
-            approved: { variant: "default", label: "Approved" },
-            rejected: { variant: "destructive", label: "Rejected" },
+        const statusConfig: Record<string, { variant: "default" | "secondary" | "destructive" | "outline", label: string, className?: string }> = {
+            unsubmitted: { variant: "outline", label: "Unsubmitted", className: "bg-gray-100 text-gray-700 border-gray-300" },
+            submitted: { variant: "outline", label: "Submitted", className: "bg-yellow-100 text-yellow-700 border-yellow-300" },
+            pending: { variant: "outline", label: "Pending", className: "bg-yellow-100 text-yellow-700 border-yellow-300" },
+            approved: { variant: "outline", label: "Approved", className: "bg-green-100 text-green-700 border-green-300" },
+            rejected: { variant: "destructive", label: "Rejected", className: "bg-red-100 text-red-700 border-red-300" },
         };
 
-        const config = statusConfig[status.toLowerCase()] || { variant: "outline" as const, label: status };
+        const config = statusConfig[status.toLowerCase()] || { 
+            variant: "outline" as const, 
+            label: status,
+            className: "bg-gray-100 text-gray-700 border-gray-300"
+        };
 
-        return <Badge variant={config.variant}>{config.label}</Badge>;
+        return <Badge variant={config.variant} className={config.className}>{config.label}</Badge>;
     };
 
     const onSubmit = async (values: FormValues) => {
