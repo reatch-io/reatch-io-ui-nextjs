@@ -11,7 +11,6 @@ import { useEffect, useState } from "react";
 const channelOptions = [
 	{ value: "email", label: "Email", icon: <Mail size={16} className="text-blue-600" /> },
 	{ value: "whatsapp", label: "WhatsApp", icon: <MessageCircle size={16} className="text-green-600" /> },
-	{ value: "push", label: "Push Notifications", icon: <Bell size={16} className="text-purple-600" /> },
 ];
 
 const channelApis = {
@@ -19,8 +18,6 @@ const channelApis = {
         api.get(`/api/email/${campaignId}`, { headers: { "X-Project-ID": projectId } }),
     whatsapp: (projectId: string, campaignId: string) =>
         api.get(`/api/whatsapp/templates/campaigns/${campaignId}`, { headers: { "X-Project-ID": projectId } }),
-    push: (projectId: string, campaignId: string) =>
-        api.get(`/api/push/campaigns/${campaignId}`, { headers: { "X-Project-ID": projectId } }),
 };
 
 export default function CampaignChannels() {

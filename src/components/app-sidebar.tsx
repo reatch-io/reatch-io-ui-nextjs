@@ -15,15 +15,37 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Progress } from "@/components/ui/progress"
+import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useUser } from "@auth0/nextjs-auth0";
 import api from "@/api/auth/app-api"
+import { Usage } from "@/models/subscription"
 
-// Menu items.
-const items = [
+// Setup menu items
+const setupItems = [
+    {
+        title: "Email Domain",
+        url: "domains",
+        icon: Globe,
+    },
+    {
+        title: "Whatsapp Senders",
+        url: "whatsapp",
+        icon: Send,
+    },
+    {
+        title: "Whatsapp Templates",
+        url: "whatsapp-templates",
+        icon: MessageSquare,
+    },
+]
+
+// Execution menu items
+const executionItems = [
     {
         title: "Dashboard",
         url: "dashboard",
@@ -45,29 +67,9 @@ const items = [
         icon: Send,
     },
     {
-        title: "Domains",
-        url: "domains",
-        icon: Globe,
-    },
-    {
-        title: "Whatsapp",
-        url: "whatsapp",
-        icon: Send,
-    },
-    {
-        title: "Whatsapp Templates",
-        url: "whatsapp-templates",
-        icon: MessageSquare,
-    },
-    {
         title: "Analytics",
         url: "analytics",
         icon: BarChart2,
-    },
-    {
-        title: "Settings",
-        url: "settings",
-        icon: Settings,
     },
 ]
 
@@ -80,6 +82,7 @@ type Project = {
 export function AppSidebar() {
     const [projects, setProjects] = useState<Project[]>([])
     const [selectedProject, setSelectedProject] = useState<Project>()
+    const [usage, setUsage] = useState<Usage | null>(null)
     const pathname = usePathname()
     const router = useRouter()
     const { user } = useUser();
@@ -132,12 +135,43 @@ export function AppSidebar() {
         }
     }, [projects, pathname, router]);
 
+    // Fetch usage data
+    useEffect(() => {
+        const fetchUsage = async () => {
+            if (!selectedProject?.id) return;
+
+            try {
+                const res = await api.get(`/api/usage`, {
+                    headers: {
+                        "X-Project-ID": selectedProject.id
+                    }
+                });
+                setUsage(res.data);
+            } catch (err) {
+                console.error("Error fetching usage:", err);
+            }
+        };
+
+        fetchUsage();
+    }, [selectedProject?.id]);
+
     const handleProjectChange = (projectId: string) => {
         const project = projects.find(p => p.id === projectId);
         if (project) {
             setSelectedProject(project);
         }
     };
+
+    const formatUsageLimit = (limit: number) => {
+        if (limit >= 1000000) {
+            return `${(limit / 1000000).toFixed(1)}M`;
+        } else if (limit >= 1000) {
+            return `${(limit / 1000).toFixed(0)}K`;
+        }
+        return limit.toString();
+    };
+
+    const usagePercentage = usage && usage.limit > 0 ? (usage.consumed / usage.limit) * 100 : 0;
 
     return (
         <Sidebar>
@@ -173,25 +207,52 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
+                {/* Execution Section */}
                 <SidebarGroup>
-                    <SidebarGroupLabel>Application</SidebarGroupLabel>
+                    <SidebarGroupLabel>Execution</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {items.map((item) => {
+                            {executionItems.map((item) => {
                                 const href = '/' + selectedProject?.id + '/' + item.url
-                                // Check if the current pathname matches the menu item's path
                                 const isActive =
                                     pathname === href ||
-                                    pathname.startsWith(href + "/") // for subroutes
+                                    pathname.startsWith(href + "/")
 
-                                return (<SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild isActive={isActive}>
-                                        <Link href={'/' + selectedProject?.id + '/' + item.url}>
-                                            <item.icon />
-                                            <span>{item.title}</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
+                                return (
+                                    <SidebarMenuItem key={item.title}>
+                                        <SidebarMenuButton asChild isActive={isActive}>
+                                            <Link href={'/' + selectedProject?.id + '/' + item.url}>
+                                                <item.icon />
+                                                <span>{item.title}</span>
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                )
+                            })}
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
+
+                {/* Setup Section */}
+                <SidebarGroup>
+                    <SidebarGroupLabel>Setup</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            {setupItems.map((item) => {
+                                const href = '/' + selectedProject?.id + '/' + item.url
+                                const isActive =
+                                    pathname === href ||
+                                    pathname.startsWith(href + "/")
+
+                                return (
+                                    <SidebarMenuItem key={item.title}>
+                                        <SidebarMenuButton asChild isActive={isActive}>
+                                            <Link href={'/' + selectedProject?.id + '/' + item.url}>
+                                                <item.icon />
+                                                <span>{item.title}</span>
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
                                 )
                             })}
                         </SidebarMenu>
@@ -201,6 +262,55 @@ export function AppSidebar() {
             <SidebarFooter>
                 <SidebarMenu>
                     <SidebarMenuItem>
+                        {/* Usage Progress Bar */}
+                        {usage && usage.limit > 0 ? (
+                            <div className="px-4 py-3 space-y-2">
+                                <div className="flex items-center justify-between text-xs">
+                                    <span className="text-muted-foreground flex items-center gap-1">
+                                        <MessageSquare className="w-3 h-3" />
+                                        TCoins
+                                    </span>
+                                    <span className="font-medium">
+                                        {formatUsageLimit(usage.consumed)} / {formatUsageLimit(usage.limit)}
+                                    </span>
+                                </div>
+                                <Progress
+                                    value={usagePercentage}
+                                    className="h-1.5"
+                                />
+                                <div className="flex justify-between text-xs text-muted-foreground">
+                                    <span>{usagePercentage.toFixed(0)}% used</span>
+                                    <span>{formatUsageLimit(usage.limit - usage.consumed)} remaining</span>
+                                </div>
+                                <Link href={`/${selectedProject?.id}/usages`} className="block">
+                                    <Button
+                                        size="sm"
+                                        className="w-full text-xs bg-gradient-primary"
+                                    >
+                                        Buy Credit
+                                    </Button>
+                                </Link>
+                            </div>
+                        ) : (
+                            <div className="px-4 py-3 space-y-2">
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                                    <MessageSquare className="w-3 h-3" />
+                                    <span>No messages available</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground mb-2">
+                                    Purchase message credits to start sending campaigns
+                                </p>
+                                <Link href={`/${selectedProject?.id}/usages`} className="block">
+                                    <Button
+                                        size="sm"
+                                        className="w-full text-xs bg-gradient-primary"
+                                    >
+                                        Buy Messages
+                                    </Button>
+                                </Link>
+                            </div>
+                        )}
+
                         <div className="flex items-center gap-3 p-4 border-t mt-auto">
                             <Avatar>
                                 <AvatarImage src={user?.picture} alt={user?.name} />
