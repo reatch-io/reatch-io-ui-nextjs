@@ -8,18 +8,14 @@ import { ShoppingCart, Coins, Mail, MessageCircle, ExternalLink, Receipt } from 
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { initializePaddle, Paddle } from '@paddle/paddle-js';
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { Progress } from "@/components/ui/progress";
 import { Usage } from "@/models/subscription";
+import { DodoPayments } from "dodopayments-checkout";
 
-
-const paddleToken = process.env.NEXT_PUBLIC_PADDLE_TOKEN;
-const paddleEnvironment = process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT;
-const paddleBillingPortalUrl = process.env.NEXT_PUBLIC_PADDLE_BILLING_PORTAL_URL;
+const billingPortalUrl = process.env.NEXT_PUBLIC_PAYMENT_BILLING_PORTAL_URL || '';
 const EMAIL_COST = 1; // 1 Email = 1 TCoin
 const WHATSAPP_COST = 100; // 1 WhatsApp = 100 TCoins
-let paddle: Paddle | undefined;
 
 interface TCoinBundle {
     id: string;
@@ -37,14 +33,14 @@ const TCOIN_BUNDLES: TCoinBundle[] = [
         name: 'Starter',
         price: 10,
         tcoins: 10000,
-        priceId: process.env.NEXT_PUBLIC_PADDLE_TCOIN_STARTER_PRICE_ID || '',
+        priceId: process.env.NEXT_PUBLIC_PAYMENT_TCOIN_STARTER_PRICE_ID || '',
     },
     {
         id: 'growth',
         name: 'Growth',
         price: 50,
         tcoins: 60000,
-        priceId: process.env.NEXT_PUBLIC_PADDLE_TCOIN_GROWTH_PRICE_ID || '',
+        priceId: process.env.NEXT_PUBLIC_PAYMENT_TCOIN_GROWTH_PRICE_ID || '',
         popular: true,
         discount: 20,
     },
@@ -53,7 +49,7 @@ const TCOIN_BUNDLES: TCoinBundle[] = [
         name: 'Enterprise',
         price: 100,
         tcoins: 130000,
-        priceId: process.env.NEXT_PUBLIC_PADDLE_TCOIN_ENTERPRISE_PRICE_ID || '',
+        priceId: process.env.NEXT_PUBLIC_PAYMENT_TCOIN_ENTERPRISE_PRICE_ID || '',
         discount: 30,
     },
 ];
@@ -70,31 +66,21 @@ export default function UsagesPage() {
 
     useEffect(() => {
         setLoading(true);
-        const script = document.createElement("script");
-        script.src = "https://cdn.paddle.com/paddle/v2/paddle.js";
-        script.async = true;
-
-        script.onload = async () => {
-            paddle = await initializePaddle({
-                token: paddleToken || '',
-                environment: paddleEnvironment as 'sandbox' | 'production',
-                eventCallback: function (data) {
-                    if (data.name == "checkout.completed") {
-                        toast.success("Purchase successful! Reloading...");
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1500);
-                    }
+        DodoPayments.Initialize({
+            mode: process.env.NEXT_PUBLIC_PAYMENT_ENVIRONMENT as "live" | "test", // Change to 'live' for production
+            displayType: "overlay", // Optional: defaults to 'overlay' for overlay checkout,
+            onEvent: (event) => {
+                switch (event.event_type) {
+                    case "checkout.opened":
+                        setLoading(false);
+                        break;
+                    case "checkout.error":
+                        setLoading(false);
+                        console.error("Checkout error:", event.data?.message);
+                        break;
                 }
-            });
-            setLoading(false);
-        };
-
-        document.body.appendChild(script);
-
-        return () => {
-            document.body.removeChild(script);
-        };
+            },
+        });
     }, []);
 
     // Fetch usage
@@ -146,41 +132,65 @@ export default function UsagesPage() {
             return;
         }
 
-        if (paddle === null) {
-            toast.error("Sorry, cannot proceed with the payment.");
-            return;
-        }
-
         setPurchasing(true);
         setSelectedBundle(bundle);
 
         try {
-            const customer = {
-                email: user?.email || '',
-            };
-
-            paddle?.Checkout?.open({
-                settings: {
-                    displayMode: "overlay",
-                    variant: "one-page",
-                    allowLogout: false
-                },
-                items: [
-                    {
-                        priceId: bundle.priceId,
-                        quantity: 1
-                    }
-                ],
-                customer: customer,
-                customData: {
-                    userId: user?.sub || 'user1',
+            // Call backend API to create checkout session
+            const response = await api.post(
+                `/api/checkout`,
+                {
+                    customerId: user?.sub,
                     projectId: projectId,
-                    type: 'tcoin-purchase',
-                    bundleId: bundle.id,
-                    bundleName: bundle.name,
-                    tcoinsAmount: bundle.tcoins
+                    numberOfTCoins: bundle.tcoins,
+                    priceId: bundle.priceId,
+                    userEmail: user?.email || '',
+                    userName: user?.name || '',
+                    checkoutSuccessUrl: window.location.origin + "/" + projectId + "/usages",
+                },
+                {
+                    headers: {
+                        "X-Project-ID": projectId
+                    }
                 }
-            });
+            );
+
+            if (response.data.checkoutUrl) {
+                DodoPayments.Checkout.open({
+                    checkoutUrl: response.data.checkoutUrl,
+                    options: {
+                        themeConfig: {
+                        light: {
+                            // Background colors
+                            bgPrimary: "#FFFFFF",
+                            bgSecondary: "#F9FAFB",
+                            
+                            // Border colors
+                            borderPrimary: "#D0D5DD",
+                            borderSecondary: "#7c3bed",
+                            
+                            // Text colors
+                            textPrimary: "#344054",
+                            textSecondary: "#6B7280",
+                            textPlaceholder: "#667085",
+                            textError: "#D92D20",
+                            textSuccess: "#10B981",
+                            
+                            // Button colors
+                            buttonPrimary: "#7c3bed",
+                            buttonPrimaryHover: "#6a2fd1",
+                            buttonTextPrimary: "#FFFFFF",
+                            buttonSecondary: "#F3F4F6",
+                            buttonSecondaryHover: "#E5E7EB",
+                            buttonTextSecondary: "#344054",
+                        },
+                        radius: "8px",
+                        },
+                    },
+                });
+            } else {
+                toast.error("Failed to create checkout session");
+            }
         } catch (err) {
             console.error(err);
             toast.error("Failed to initiate checkout");
@@ -191,11 +201,11 @@ export default function UsagesPage() {
     };
 
     const handleManageBilling = () => {
-        if (!paddleBillingPortalUrl) {
+        if (!billingPortalUrl) {
             toast.error("Billing portal URL is not configured");
             return;
         }
-        window.open(paddleBillingPortalUrl, '_blank', 'noopener,noreferrer');
+        window.open(billingPortalUrl, '_blank', 'noopener,noreferrer');
     };
 
     const usagePercentage = usage && usage.limit > 0 ? (usage.consumed / usage.limit) * 100 : 0;
@@ -216,8 +226,8 @@ export default function UsagesPage() {
                         <h3 className="scroll-m-20 text-3xl font-semibold tracking-tight">TCoins & Usage</h3>
                         <p className="text-muted-foreground mt-2">Manage your credits and track consumption</p>
                     </div>
-                    <Button 
-                        variant="outline" 
+                    <Button
+                        variant="outline"
                         onClick={handleManageBilling}
                         className="gap-2"
                     >
@@ -303,11 +313,10 @@ export default function UsagesPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {TCOIN_BUNDLES.map((bundle) => (
-                            <Card 
-                                key={bundle.id} 
-                                className={`relative transition-all hover:shadow-lg ${
-                                    bundle.popular ? 'border-2 border-primary shadow-md' : 'border'
-                                }`}
+                            <Card
+                                key={bundle.id}
+                                className={`relative transition-all hover:shadow-lg ${bundle.popular ? 'border-2 border-primary shadow-md' : 'border'
+                                    }`}
                             >
                                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 flex gap-2">
                                     {bundle.popular && (
