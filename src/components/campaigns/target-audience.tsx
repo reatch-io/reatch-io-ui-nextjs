@@ -12,7 +12,7 @@ import { Segment } from "@/models/segment";
 import { CustomerTableClient } from "@/app/[projectId]/customers/customers-list";
 
 
-export default function TargetAudience() {
+export default function TargetAudience({ isReadOnly = false }: { isReadOnly?: boolean }) {
     const params = useParams();
     const { projectId, campaignId } = params as { projectId: string; campaignId: string };
     const [segments, setSegments] = useState<Segment[]>([]);
@@ -115,7 +115,7 @@ export default function TargetAudience() {
                 {loading ? (
                     <Skeleton className="h-10 w-full rounded" />
                 ) : (
-                    <Select value={selectedSegment} onValueChange={setSelectedSegment}>
+                    <Select value={selectedSegment} onValueChange={setSelectedSegment} disabled={isReadOnly}>
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select a segment" />
                         </SelectTrigger>
@@ -130,7 +130,7 @@ export default function TargetAudience() {
                 )}
                 
                 <div className="flex mt-4">
-                    <Button className="bg-gradient-primary" onClick={handleSave} disabled={saving || !selectedSegment}>
+                    <Button className="bg-gradient-primary" onClick={handleSave} disabled={saving || !selectedSegment || isReadOnly}>
                         {saving ? "Saving..." : "Save"}
                     </Button>
                 </div>

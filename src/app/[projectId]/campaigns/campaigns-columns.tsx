@@ -4,6 +4,7 @@ import { Campaign } from "@/models/campaign"
 import { ColumnDef } from "@tanstack/react-table"
 import { Mail, MessageCircle } from "lucide-react"
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 
 export const campaignsColumns: ColumnDef<Campaign>[] = [
@@ -25,20 +26,6 @@ export const campaignsColumns: ColumnDef<Campaign>[] = [
             })
             : "-"}
         </div>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "channel",
-    header: "Channel",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        {row.original.channel === "email" ? (
-          <Mail size={16} className="text-blue-600" />
-        ) : row.original.channel === "whatsapp" ? (
-          <MessageCircle size={16} className="text-green-600" />
-        ) : null}
-        <span>{row.original.channel != null ? row.original.channel : "-"}</span>
       </div>
     ),
   },
@@ -69,16 +56,33 @@ export const campaignsColumns: ColumnDef<Campaign>[] = [
       if (type === "SCHEDULED") color = "bg-pink-100 text-pink-700";
       else if (type === "ACTION_BASED") color = "bg-indigo-100 text-indigo-700";
       else if (type === "API_TRIGGERED") color = "bg-cyan-100 text-cyan-700";
+      
+      // Remove underscores and format text
+      const formattedType = type
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+      
       return (
         <Badge className={`px-2 py-1 rounded ${color}`} variant="outline">
-          {type?.charAt(0).toUpperCase() + type?.slice(1).toLowerCase()}
+          {formattedType}
         </Badge>
       );
     }
   },
   {
-    accessorKey: "segment",
+    accessorKey: "segmentId",
     header: "Segment",
+    cell: ({ row }) => {
+      const segment = row.original.segmentId;
+      return segment ? (
+        <Link href={`segments/${segment}`} className="text-blue-600 hover:underline" onClick={e => e.stopPropagation()}>
+          View segment
+        </Link>
+      ) : (
+        <span className="text-muted-foreground">-</span>
+      );
+    }
   },
   {
     accessorKey: "totalSent",

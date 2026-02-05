@@ -35,7 +35,7 @@ const daysOfWeek = [
     { value: "SUNDAY", label: "Sun" },
 ];
 
-export default function ScheduledDeliveryComponent({ campaign }: { campaign: Campaign }) {
+export default function ScheduledDeliveryComponent({ campaign, isReadOnly }: { campaign: Campaign; isReadOnly?: boolean }) {
     const params = useParams();
     const { projectId, campaignId } = params as { projectId: string; campaignId: string };
     const [scheduledDelivery, setScheduledDelivery] = useState<ScheduledDelivery>(() =>
@@ -47,7 +47,7 @@ export default function ScheduledDeliveryComponent({ campaign }: { campaign: Cam
     useEffect(() => {
         setLoading(true);
         api.get(
-            `/api/campaigns/${campaignId}/schedule`
+            `/api/campaigns/${campaignId}/delivery`
         )
             .then((response) => {
                 const data = response.data;
@@ -142,7 +142,7 @@ export default function ScheduledDeliveryComponent({ campaign }: { campaign: Cam
             <div className="grid gap-4 md:grid-cols-2">
                 <div>
                     <label className="block text-sm font-medium mb-1">Frequency</label>
-                    <Select value={frequency} onValueChange={val => updateField("frequency", val as ScheduledDelivery["frequency"])}>
+                    <Select value={frequency} onValueChange={val => updateField("frequency", val as ScheduledDelivery["frequency"])} disabled={isReadOnly}>
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select frequency" />
                         </SelectTrigger>
@@ -159,6 +159,7 @@ export default function ScheduledDeliveryComponent({ campaign }: { campaign: Cam
                         value={startingDate}
                         onChangeAction={val => updateField("startingDate", val ? new Date(val).toISOString() : "")}
                         step={900} // 15 minutes
+                        disabled={isReadOnly}
                     />
                 </div>
                 {frequency !== "ONCE" && (
@@ -170,6 +171,7 @@ export default function ScheduledDeliveryComponent({ campaign }: { campaign: Cam
                             className="w-full border rounded px-3 py-2"
                             value={recurrence}
                             onChange={e => updateField("recurrence", Number(e.target.value))}
+                            disabled={isReadOnly}
                         />
                         <div className="text-xs text-muted-foreground mt-1">
                             {frequency === "DAILY" && recurrence > 1 && (
@@ -199,6 +201,7 @@ export default function ScheduledDeliveryComponent({ campaign }: { campaign: Cam
                         <div className="flex gap-2 flex-wrap">
                             {daysOfWeek.map(day => (
                                 <button
+                                    disabled={isReadOnly}
                                     type="button"
                                     key={day.value}
                                     className={`px-2 py-1 rounded border text-xs ${selectedDays.includes(day.value)
@@ -217,7 +220,7 @@ export default function ScheduledDeliveryComponent({ campaign }: { campaign: Cam
                 {frequency !== "ONCE" && (
                     <div>
                         <label className="block text-sm font-medium mb-1">Ending Type</label>
-                        <Select value={endingType} onValueChange={val => updateField("endingType", val as ScheduledDelivery["endingType"])}>
+                        <Select value={endingType} onValueChange={val => updateField("endingType", val as ScheduledDelivery["endingType"])} disabled={isReadOnly}>
                             <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Select ending type" />
                             </SelectTrigger>
@@ -238,7 +241,7 @@ export default function ScheduledDeliveryComponent({ campaign }: { campaign: Cam
                                 updateField("endingDate", val ? new Date(val).toISOString() : "")
                             }
                             className="w-full"
-                            disabled={false}
+                            disabled={isReadOnly}
                         />
                     </div>
                 )}
@@ -251,6 +254,7 @@ export default function ScheduledDeliveryComponent({ campaign }: { campaign: Cam
                             className="w-full border rounded px-3 py-2"
                             value={endingRecurrence}
                             onChange={e => updateField("endingRecurrence", Number(e.target.value))}
+                            disabled={isReadOnly}
                         />
                         <div className="text-xs text-muted-foreground mt-1">
                             The campaign will stop after {endingRecurrence} {endingRecurrence === 1 ? "recurrence" : "recurrences"}.
@@ -262,7 +266,7 @@ export default function ScheduledDeliveryComponent({ campaign }: { campaign: Cam
                 <blockquote className="mt-6 border-l-2 pl-6 text-sm">{summaryText}</blockquote>
             )}
             <div className="flex mt-6">
-                <Button onClick={handleSave} className="bg-gradient-primary" disabled={loading}>
+                <Button onClick={handleSave} className="bg-gradient-primary" disabled={loading || isReadOnly}>
                     {loading ? "Saving..." : "Save"}
                 </Button>
             </div>

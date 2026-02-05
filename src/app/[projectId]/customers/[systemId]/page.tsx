@@ -3,7 +3,7 @@
 import api from "@/api/auth/app-api";
 import { Button } from "@/components/ui/button";
 import { Customer } from "@/models/customer";
-import { ArrowLeft, Pencil } from "lucide-react";
+import { ArrowLeft, Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -45,12 +45,20 @@ export default function CustomerDetailsPage() {
           </h3>
           <p className="leading-7">Customer ID: {customer?.customerId}</p>
         </div>
-        <Link href={`${systemId}/edit`}>
-          <Button className="ml-4 bg-gradient-primary" variant="default">
-            <Pencil size={16} />
-            Edit customer
-          </Button>
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href={`${systemId}/log-event`}>
+            <Button variant="outline" className="flex items-center gap-2">
+              <Plus size={16} />
+              Log Event
+            </Button>
+          </Link>
+          <Link href={`${systemId}/edit`}>
+            <Button className="bg-gradient-primary" variant="default">
+              <Pencil size={16} />
+              Edit customer
+            </Button>
+          </Link>
+        </div>
       </div>
       <div className="mt-8">
         <Tabs defaultValue="info">

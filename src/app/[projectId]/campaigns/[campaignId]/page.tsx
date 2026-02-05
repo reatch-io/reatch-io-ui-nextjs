@@ -25,7 +25,11 @@ function Stepper({ currentStep, onStepClick }: { currentStep: number; onStepClic
         <div className="flex justify-center">
             <div className="flex items-center gap-4 mb-8">
                 {steps.map((step, idx) => (
-                    <div key={step} className="flex items-center cursor-pointer select-none" onClick={() => onStepClick(idx)}>
+                    <div 
+                        key={step} 
+                        className={`flex items-center select-none cursor-pointer`} 
+                        onClick={() => onStepClick(idx)}
+                    >
                         <div className={`flex items-center justify-center rounded-full w-8 h-8 text-sm font-bold
                             ${idx === currentStep
                                 ? "border-2 bg-gradient-primary text-white"
@@ -68,6 +72,8 @@ export default function CampaignPage() {
     const [campaign, setCampaign] = useState<Campaign>();
     const [currentStep, setCurrentStep] = useState(0);
 
+    // Check if campaign is in read-only mode
+    const isReadOnly = campaign?.status !== "DRAFT";
 
     useEffect(() => {
         api.get(`/api/campaigns/${campaignId}`, {
@@ -152,6 +158,16 @@ export default function CampaignPage() {
                     </div>
                 )}
             </div>
+
+            {/* Read-only warning banner */}
+            {isReadOnly && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+                    <p className="text-sm text-amber-800">
+                        ⚠️ <strong>Read-only mode:</strong> This campaign is not in draft status. You cannot modify the settings.
+                    </p>
+                </div>
+            )}
+
             {/* Campaign name and description at the top */}
             <div className="flex items-center justify-between mb-6">
                 <div>
@@ -172,23 +188,23 @@ export default function CampaignPage() {
                     </p>
                 </div>
             </div>
-            <Stepper currentStep={currentStep} onStepClick={setCurrentStep} />
+            <Stepper currentStep={currentStep} onStepClick={setCurrentStep}/>
             {currentStep === 0 && (
                 <div className="grid w-full items-center gap-3 border rounded-lg p-6 mt-6 mb-6">
                     <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight mb-2">Compose Messages</h3>
                     <div className="mb-4">
-                        <CampaignChannels />
+                        <CampaignChannels isReadOnly={isReadOnly} />
                     </div>
                 </div>
             )}
             {currentStep === 1 && (
                 <div className="grid w-full items-center gap-3 border rounded-lg p-6 mt-6 mb-6">
                     <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight mb-2">Schedule Delivery</h3>
-                    {campaign && <CampaignDelivery />}
+                    {campaign && <CampaignDelivery isReadOnly={isReadOnly} />}
                 </div>
             )}
             {currentStep === 2 && (
-                <TargetAudience />
+                <TargetAudience isReadOnly={isReadOnly} />
             )}
         </div>
     );

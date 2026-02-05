@@ -20,7 +20,7 @@ const channelApis = {
         api.get(`/api/whatsapp/templates/campaigns/${campaignId}`, { headers: { "X-Project-ID": projectId } }),
 };
 
-export default function CampaignChannels() {
+export default function CampaignChannels({ isReadOnly = false }: { isReadOnly?: boolean }) {
 	const router = useRouter();
     const params = useParams();
     const { projectId, campaignId } = params as { projectId: string; campaignId: string };
@@ -72,6 +72,7 @@ export default function CampaignChannels() {
 								<span className="text-xs text-muted-foreground">Not configured</span>
 							)}
 							<Button
+								disabled={isReadOnly}
 								variant="outline"
 								size="sm"
 								onClick={() =>
