@@ -1,7 +1,6 @@
 'use client'
 
-import { BarChart2, Globe, Home, Layers, MessageSquare, Send, Settings, Users } from "lucide-react"
-
+import { BarChart2, Globe, Home, Layers, MessageSquare, Send, Settings, Users, Plus } from "lucide-react"
 import {
     Sidebar,
     SidebarContent,
@@ -159,6 +158,19 @@ export function AppSidebar() {
         const project = projects.find(p => p.id === projectId);
         if (project) {
             setSelectedProject(project);
+            window.location.href = `/${projectId}/dashboard`;
+        }
+    };
+
+    const handleAddNewProject = () => {
+        console.log("Add new project");
+        router.push('/projects/new');
+    };
+
+    const handleManageProject = () => {
+        if (selectedProject?.id) {
+            console.log("Manage project:", selectedProject.id);
+            router.push(`/${selectedProject.id}/settings`);
         }
     };
 
@@ -184,7 +196,6 @@ export function AppSidebar() {
                             </Avatar>
                             <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">reatch.io</span>
                         </div>
-
                     </SidebarMenuItem>
                     <SidebarMenuItem>
                         <SidebarGroupLabel>Projects</SidebarGroupLabel>
@@ -203,6 +214,27 @@ export function AppSidebar() {
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
+                        
+                        {/* New buttons below project dropdown */}
+                        <div className="flex gap-2 mt-3 px-2 flex-col">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleAddNewProject}
+                            >
+                                <Plus className="w-4 h-4 mr-1" />
+                                New Project
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleManageProject}
+                                disabled={!selectedProject}
+                            >
+                                <Settings className="w-4 h-4 mr-1" />
+                                Manage Project
+                            </Button>
+                        </div>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
