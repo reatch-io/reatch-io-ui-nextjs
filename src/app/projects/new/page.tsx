@@ -73,7 +73,7 @@ export default function NewProjectPage() {
                         </Label>
                         <Input
                             id="projectName"
-                            placeholder="e.g., Marketing Campaign 2026"
+                            placeholder="e.g., Spring Sale Campaigns"
                             value={projectName}
                             onChange={(e) => setProjectName(e.target.value)}
                             maxLength={100}
@@ -94,17 +94,13 @@ export default function NewProjectPage() {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             rows={4}
-                            maxLength={500}
                         />
-                        <p className="text-xs text-muted-foreground">
-                            {description.length}/500 characters
-                        </p>
                     </div>
 
                     {/* Info Box */}
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                         <p className="text-sm text-blue-800">
-                            💡 <strong>Tip:</strong> You can configure integrations and set up API keys after creating the project.
+                            💡 <strong>Tip:</strong> You can configure integrations after creating the project.
                         </p>
                     </div>
 

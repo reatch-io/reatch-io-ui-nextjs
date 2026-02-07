@@ -139,12 +139,14 @@ export default function ProjectSettingsPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <Link href={`/${projectId}/dashboard`}>
-                        <Button variant="ghost" className="flex items-center gap-2 mb-2">
-                            <ArrowLeft size={16} />
-                            Back to Dashboard
-                        </Button>
-                    </Link>
+                    <div className="mb-8">
+                        <Link href={`/${projectId}/dashboard`}>
+                            <Button variant="outline" className="flex items-center gap-2 mb-2">
+                                <ArrowLeft size={16} />
+                                Back to Dashboard
+                            </Button>
+                        </Link>
+                    </div>
                     <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
                         <Settings className="w-8 h-8" />
                         Project Settings

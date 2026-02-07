@@ -210,24 +210,26 @@ export function AppSidebar() {
                             </SelectContent>
                         </Select>
                         
-                        {/* New buttons below project dropdown */}
-                        <div className="flex gap-2 mt-3 px-2 flex-col">
+                        {/* New buttons below project dropdown - subtle styling */}
+                        <div className="flex gap-2 mt-2 px-2">
                             <Button
-                                variant="outline"
+                                variant="ghost"
                                 size="sm"
                                 onClick={handleAddNewProject}
+                                className="flex-1 text-xs text-muted-foreground hover:text-foreground h-8"
                             >
-                                <Plus className="w-4 h-4 mr-1" />
+                                <Plus className="w-3 h-3 mr-1" />
                                 New Project
                             </Button>
                             <Button
-                                variant="outline"
+                                variant="ghost"
                                 size="sm"
                                 onClick={handleManageProject}
                                 disabled={!selectedProject}
+                                className="flex-1 text-xs text-muted-foreground hover:text-foreground h-8"
                             >
-                                <Settings className="w-4 h-4 mr-1" />
-                                Manage Project
+                                <Settings className="w-3 h-3 mr-1" />
+                                Settings
                             </Button>
                         </div>
                     </SidebarMenuItem>
