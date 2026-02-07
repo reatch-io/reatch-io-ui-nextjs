@@ -141,7 +141,7 @@ export default function ProjectSettingsPage() {
                 <div>
                     <div className="mb-8">
                         <Link href={`/${projectId}/dashboard`}>
-                            <Button variant="outline" className="flex items-center gap-2 mb-2">
+                            <Button variant="outline">
                                 <ArrowLeft size={16} />
                                 Back to Dashboard
                             </Button>
