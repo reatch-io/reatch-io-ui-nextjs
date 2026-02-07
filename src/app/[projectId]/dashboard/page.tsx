@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 interface DashboardStats {
     totalCampaigns: number;
     activeCampaigns: number;
-    totalContacts: number;
+    totalCustomers: number;
     totalSent: number;
     totalOpens: number;
     totalClicks: number;
@@ -91,8 +91,8 @@ export default function DashboardPage() {
             change: null,
         },
         {
-            title: "Total Contacts",
-            value: stats?.totalContacts || 0,
+            title: "Total Customers",
+            value: stats?.totalCustomers || 0,
             icon: <Users className="w-5 h-5 text-purple-600" />,
             bgColor: "bg-purple-50",
             change: null,
@@ -163,11 +163,16 @@ export default function DashboardPage() {
     const formatDate = (dateString: string) => {
         if (!dateString) return "Never";
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
+        // include time
+        const options: Intl.DateTimeFormatOptions = { 
             month: 'short', 
             day: 'numeric', 
-            year: 'numeric' 
-        });
+            year: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric',
+        };
+        return date.toLocaleDateString('en-US', options);
     };
 
     return (
@@ -246,15 +251,15 @@ export default function DashboardPage() {
                                         </div>
                                         <div className="flex items-center gap-6 text-sm">
                                             <div className="text-center">
-                                                <p className="font-semibold">{campaign.totalSent}</p>
+                                                <p className="font-semibold">{campaign.totalSent ? campaign.totalSent : "-"}</p>
                                                 <p className="text-muted-foreground">Sent</p>
                                             </div>
                                             <div className="text-center">
-                                                <p className="font-semibold">{campaign.totalOpens}</p>
+                                                <p className="font-semibold">{campaign.totalOpens ? campaign.totalOpens : "-"}</p>
                                                 <p className="text-muted-foreground">Opens</p>
                                             </div>
                                             <div className="text-center">
-                                                <p className="font-semibold">{campaign.totalClicks}</p>
+                                                <p className="font-semibold">{campaign.totalClicks ? campaign.totalClicks : "-"}</p>
                                                 <p className="text-muted-foreground">Clicks</p>
                                             </div>
                                         </div>
