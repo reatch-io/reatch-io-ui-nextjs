@@ -197,11 +197,7 @@ export default function ProjectSettingsPage() {
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                     rows={4}
-                                    maxLength={500}
                                 />
-                                <p className="text-xs text-muted-foreground">
-                                    {description.length}/500 characters
-                                </p>
                             </div>
 
                             {/* Save Button */}

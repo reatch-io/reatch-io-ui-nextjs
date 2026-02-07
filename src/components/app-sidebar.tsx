@@ -65,11 +65,6 @@ const executionItems = [
         url: "campaigns",
         icon: Send,
     },
-    {
-        title: "Analytics",
-        url: "analytics",
-        icon: BarChart2,
-    },
 ]
 
 type Project = {
