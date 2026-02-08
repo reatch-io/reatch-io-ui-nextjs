@@ -19,29 +19,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { DashboardStats } from "@/models/analytics";
 
-interface DashboardStats {
-    totalCampaigns: number;
-    activeCampaigns: number;
-    totalCustomers: number;
-    totalSent: number;
-    totalOpens: number;
-    totalClicks: number;
-    openRate: number;
-    clickRate: number;
-    recentCampaigns: RecentCampaign[];
-}
-
-interface RecentCampaign {
-    id: string;
-    name: string;
-    status: string;
-    deliveryType: string;
-    totalSent: number;
-    totalOpens: number;
-    totalClicks: number;
-    lastSent: string;
-}
 
 export default function DashboardPage() {
     const params = useParams();

@@ -15,15 +15,6 @@ export type Campaign = {
     lastSent: string;
 };
 
-export type CampaignsInsights = {
-    totalCampaigns: number;
-    activeCampaigns: number;
-    pausedCampaigns: number;
-    archivedCampaigns: number;
-    averageOpenRate: number;
-    messagesSent: number;
-};
-
 export type DeliveryType = "SCHEDULED" | "ACTION_BASED" | "API_TRIGGERED";
 
 export type ScheduledDelivery = {

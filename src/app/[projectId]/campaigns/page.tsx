@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { CampaignsTableClient } from "./campaigns-list";
-import { Campaign, CampaignsInsights } from "@/models/campaign";
+import { Campaign } from "@/models/campaign";
+import { CampaignAnalytics, CampaignsAnalytics } from "@/models/analytics";
 
 export default function CampaignsPage() {
     const [data, setData] = useState<Campaign[]>([])
@@ -18,7 +19,7 @@ export default function CampaignsPage() {
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(20);
     const [isLoading, setIsLoading] = useState(false);
-    const [campaignsInsights, setCampaignsInsights] = useState<CampaignsInsights>();
+    const [campaignsAnalytics, setCampaignsAnalytics] = useState<CampaignsAnalytics>();
 
     const router = useRouter();
 
@@ -41,12 +42,12 @@ export default function CampaignsPage() {
     }, [page, pageSize]);
 
     useEffect(() => {
-        api.get(`/api/campaigns/insights`, {
+        api.get(`/api/analytics/campaigns`, {
             headers: {
                 "X-Project-ID": projectId
             }
         }).then((response) => {
-            setCampaignsInsights(response.data)
+            setCampaignsAnalytics(response.data)
         }).catch(() => {
         });
     }, [projectId]);
@@ -77,22 +78,27 @@ export default function CampaignsPage() {
             </div>
             <div className="flex flex-row gap-4 mt-6 w-full">
                 <InfoBox
-                    title={campaignsInsights?.totalCampaigns != null ? String(campaignsInsights.totalCampaigns) : "—"}
+                    title={campaignsAnalytics?.total != null ? String(campaignsAnalytics.total) : "—"}
                     description="Total Campaigns"
                 />
                 <InfoBox
-                    title={campaignsInsights?.activeCampaigns != null ? String(campaignsInsights.activeCampaigns) : "—"}
+                    title={campaignsAnalytics?.active != null ? String(campaignsAnalytics.active) : "—"}
                     description="Active Campaigns"
                     titleClassName="text-green-600"
                 />
                 <InfoBox
-                    title={campaignsInsights?.messagesSent != null ? String(campaignsInsights.messagesSent) : "—"}
+                    title={campaignsAnalytics?.totalSent != null ? String(campaignsAnalytics.totalSent) : "—"}
                     description="Messages Sent"
                     titleClassName="text-green-600"
                 />
                 <InfoBox
-                    title={campaignsInsights?.averageOpenRate != null ? String(campaignsInsights.averageOpenRate) : "—"}
+                    title={campaignsAnalytics?.openRate != null ? String(campaignsAnalytics.openRate) + "%" : "—"}
                     description="Average Open Rate"
+                    titleClassName="text-green-600"
+                />
+                <InfoBox
+                    title={campaignsAnalytics?.clickRate != null ? String(campaignsAnalytics.clickRate) + "%" : "—"}
+                    description="Average Click Rate"
                     titleClassName="text-green-600"
                 />
             </div>
