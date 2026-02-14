@@ -66,27 +66,9 @@ export default function CustomerDetailsPage() {
             <TabsTrigger value="info" className="flex items-center gap-2">
               <User size={16} /> Customer Information
             </TabsTrigger>
-            <TabsTrigger value="engagement" className="flex items-center gap-2">
-              <BarChart2 size={16} /> Engagement statistics
-            </TabsTrigger>
-            <TabsTrigger value="campaign" className="flex items-center gap-2">
-              <Send size={16} /> Campaign attribution
-            </TabsTrigger>
-            <TabsTrigger value="behavior" className="flex items-center gap-2">
-              <Activity size={16} /> Behavior trends
-            </TabsTrigger>
           </TabsList>
           <TabsContent value="info">
             <CustomerInformation customer={customer} />
-          </TabsContent>
-          <TabsContent value="engagement">
-            <div className="p-4">Engagement statistics</div>
-          </TabsContent>
-          <TabsContent value="campaign">
-            <div className="p-4">Campaign attribution</div>
-          </TabsContent>
-          <TabsContent value="behavior">
-            <div className="p-4">Behavior trends</div>
           </TabsContent>
         </Tabs>
       </div>

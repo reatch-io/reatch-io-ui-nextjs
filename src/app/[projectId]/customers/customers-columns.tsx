@@ -45,10 +45,6 @@ export const customersColumns: ColumnDef<Customer>[] = [
     },
   },
   {
-    accessorKey: "lastActivity",
-    header: "Last Activity",
-  },
-  {
     accessorKey: "segment",
     header: "Segment",
     cell: ({ row }) => (
@@ -60,13 +56,6 @@ export const customersColumns: ColumnDef<Customer>[] = [
     header: "Status",
     cell: ({ row }) => (
       <CustomerStatus status={row.original.status}></CustomerStatus>
-    ),
-  },
-  {
-    accessorKey: "totalSpent",
-    header: "Total Spent",
-    cell: ({ row }) => (
-      <span className="font-bold">{row.original.totalSpent}</span>
     ),
   },
 ]

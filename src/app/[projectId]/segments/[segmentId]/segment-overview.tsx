@@ -54,8 +54,7 @@ export default function SegmentOverview({ segment }: { segment: Segment }) {
                 <SegmentGroups initialGroups={segment.groups as SegmentGroup[]} readOnly />
             </div>
             {/* Metrics Cards Row */}
-            <div className="flex flex-col md:flex-row gap-6 w-full">
-                {/* Revenue Metrics Card */}
+            {/* <div className="flex flex-col md:flex-row gap-6 w-full">
                 <div className="rounded-lg border bg-card shadow-sm p-6 flex flex-col w-full md:w-1/3">
                     <h4 className="font-semibold text-lg mb-2">Revenue Metrics</h4>
                     <div className="mb-1 flex items-center justify-between">
@@ -71,7 +70,6 @@ export default function SegmentOverview({ segment }: { segment: Segment }) {
                         <span className="font-bold">{segment.totalRevenue ?? "-"}</span>
                     </div>
                 </div>
-                {/* Customer Health Card */}
                 <div className="rounded-lg border bg-card shadow-sm p-6 flex flex-col w-full md:w-1/3">
                     <h4 className="font-semibold text-lg mb-2">Customer Health</h4>
                     <div className="mb-1 flex items-center justify-between">
@@ -87,7 +85,7 @@ export default function SegmentOverview({ segment }: { segment: Segment }) {
                         <span className="font-bold">{segment.engagementRate != null ? `${segment.engagementRate}%` : "-"}</span>
                     </div>
                 </div>
-                {/* Behavior Insights Card */}
+                
                 <div className="rounded-lg border bg-card shadow-sm p-6 flex flex-col w-full md:w-1/3">
                     <h4 className="font-semibold text-lg mb-2">Behavior Insights</h4>
                     <div className="mb-1 flex items-center justify-between">
@@ -103,7 +101,7 @@ export default function SegmentOverview({ segment }: { segment: Segment }) {
                         <span className="font-bold">{segment.peakActivity ?? "-"}</span>
                     </div>
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 }

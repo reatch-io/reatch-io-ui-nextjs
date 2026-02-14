@@ -79,7 +79,7 @@ export default function SegmentDetailsPage() {
                 </div>
             </div>
             {/* Info boxes */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 my-8">
+            {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 my-8">
                 <InfoBox
                     description="Total Customers"
                     title={segment.customersCount ?? "-"}
@@ -99,10 +99,10 @@ export default function SegmentDetailsPage() {
                     title={segment.engagementRate != null ? `${segment.engagementRate}%` : "65.3%"}
                     className="text-purple-700"
                 />
-            </div>
+            </div> */}
             {/* Tabs */}
-            <Tabs value={tab} onValueChange={setTab} className="mb-8">
-                <TabsList className="flex w-full justify-start gap-2">
+            <Tabs value={tab} onValueChange={setTab} className="mb-8 mt-6">
+                <TabsList className="flex justify-start gap-2">
                     <TabsTrigger value="overview" className="flex items-center gap-2">
                         <LayoutDashboard size={18} />
                         Overview
@@ -114,28 +114,12 @@ export default function SegmentDetailsPage() {
                             ({segment.customersCount ?? 0})
                         </span>
                     </TabsTrigger>
-                    <TabsTrigger value="performance" className="flex items-center gap-2">
-                        <BarChart2 size={18} />
-                        Performance
-                    </TabsTrigger>
-                    <TabsTrigger value="analytics" className="flex items-center gap-2">
-                        <PieChart size={18} />
-                        Analytics
-                    </TabsTrigger>
                 </TabsList>
                 <TabsContent value="overview" className="pt-6">
                     <SegmentOverview segment={segment} />
                 </TabsContent>
                 <TabsContent value="customers" className="pt-6">
                     <CustomerTableClient segmentId={segment.id} />
-                </TabsContent>
-                <TabsContent value="performance" className="pt-6">
-                    {/* You can add your performance charts or stats here */}
-                    <div className="text-muted-foreground">Performance content goes here.</div>
-                </TabsContent>
-                <TabsContent value="analytics" className="pt-6">
-                    {/* You can add your analytics charts or stats here */}
-                    <div className="text-muted-foreground">Analytics content goes here.</div>
                 </TabsContent>
             </Tabs>
         </div>

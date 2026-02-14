@@ -63,7 +63,7 @@ export default function CustomerInformation({ customer }: CustomerInformationPro
                 </div>
 
                 {/* Right: Two stacked cards (each 30% width) */}
-                <div className="flex flex-col gap-4 flex-1 basis-[30%]">
+                <div className="flex flex-col gap-4 flex-1 basis-[30%] h-full">
                     {/* Status & Segment Card */}
                     <div className="border rounded-lg p-6 bg-white shadow-sm">
                         <div className="font-semibold text-lg mb-4">Status &amp; Segment</div>
@@ -77,7 +77,7 @@ export default function CustomerInformation({ customer }: CustomerInformationPro
                         </div>
                     </div>
                     {/* Activity Card */}
-                    <div className="border rounded-lg p-6 bg-white shadow-sm">
+                    {/* <div className="border rounded-lg p-6 bg-white shadow-sm">
                         <div className="font-semibold text-lg mb-4">Activity</div>
                         <div>
                             <div className="text-xs text-muted-foreground mb-1">Last Activity</div>
@@ -101,7 +101,7 @@ export default function CustomerInformation({ customer }: CustomerInformationPro
                                 {customer.totalSpent || <span className="text-muted-foreground">-</span>}
                             </div>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
 
