@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import api from "@/api/auth/app-api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Settings, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, Settings, Save, Trash2, Key, Copy, Plus, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import {
@@ -23,16 +23,22 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { ApiKeysTableClient } from "./api-keys-list";
+import { Project } from "@/models/project";
 
-interface Project {
-    id: string;
-    name: string;
-    description?: string;
-}
 
 export default function ProjectSettingsPage() {
     const params = useParams();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { projectId } = params as { projectId: string };
     
     const [project, setProject] = useState<Project | null>(null);
@@ -42,6 +48,15 @@ export default function ProjectSettingsPage() {
     const [isSaving, setIsSaving] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
+    // Get active tab from URL or default to "general"
+    const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "general");
+
+    // API Keys state
+    const [newKeyName, setNewKeyName] = useState("");
+    const [isCreatingKey, setIsCreatingKey] = useState(false);
+    const [newlyCreatedKey, setNewlyCreatedKey] = useState<string | null>(null);
+    const [showKeyDialog, setShowKeyDialog] = useState(false);
+    
     useEffect(() => {
         setLoading(true);
         api.get(`/api/projects/${projectId}`, {
@@ -63,6 +78,22 @@ export default function ProjectSettingsPage() {
                 setLoading(false);
             });
     }, [projectId]);
+
+    // Sync tab with URL
+    useEffect(() => {
+        const tabFromUrl = searchParams.get("tab");
+        if (tabFromUrl && (tabFromUrl === "general" || tabFromUrl === "api-keys")) {
+            setActiveTab(tabFromUrl);
+        }
+    }, [searchParams]);
+
+    const handleTabChange = (value: string) => {
+        setActiveTab(value);
+        // Update URL without triggering a full page reload
+        const url = new URL(window.location.href);
+        url.searchParams.set("tab", value);
+        router.push(url.pathname + url.search, { scroll: false });
+    };
 
     const handleUpdateProject = async () => {
         if (!projectName.trim()) {
@@ -106,16 +137,47 @@ export default function ProjectSettingsPage() {
         }
     };
 
-    const formatDate = (dateString: string) => {
-        if (!dateString) return "N/A";
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+    const handleCreateApiKey = async () => {
+        if (!newKeyName.trim()) {
+            toast.error("API key name is required");
+            return;
+        }
+
+        setIsCreatingKey(true);
+        try {
+            const response = await api.post(
+                `/api/projects/api-keys`,
+                { name: newKeyName.trim() },
+                {
+                    headers: {
+                        "X-Project-ID": projectId,
+                    },
+                }
+            );
+            
+            setNewKeyName("");
+            setNewlyCreatedKey(response.data.apiKey);
+            setShowKeyDialog(true);
+            toast.success("API key created successfully");
+        } catch (error) {
+            console.error("Failed to create API key:", error);
+            toast.error("Failed to create API key");
+        } finally {
+            setIsCreatingKey(false);
+        }
+    };
+
+    const handleCopyNewKey = () => {
+        if (newlyCreatedKey) {
+            navigator.clipboard.writeText(newlyCreatedKey);
+            toast.success("API key copied to clipboard");
+        }
+    };
+
+    const handleCloseKeyDialog = () => {
+        setShowKeyDialog(false);
+        setNewlyCreatedKey(null);
+        window.location.reload(); // Reload to show the new key in the list
     };
 
     if (loading) {
@@ -158,9 +220,10 @@ export default function ProjectSettingsPage() {
             </div>
 
             {/* Tabs */}
-            <Tabs defaultValue="general" className="space-y-6">
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
                 <TabsList>
                     <TabsTrigger value="general">General</TabsTrigger>
+                    <TabsTrigger value="api-keys">API Keys</TabsTrigger>
                 </TabsList>
 
                 {/* General Tab */}
@@ -263,7 +326,111 @@ export default function ProjectSettingsPage() {
                         </CardContent>
                     </Card>
                 </TabsContent>
+
+                {/* API Keys Tab */}
+                <TabsContent value="api-keys" className="space-y-6">
+                    {/* Create New API Key Card */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Key className="w-5 h-5" />
+                                Create API Key
+                            </CardTitle>
+                            <CardDescription>
+                                Generate a new API key for programmatic access to your project
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="flex gap-3">
+                                <div className="flex-1">
+                                    <Input
+                                        placeholder="Enter API key name (e.g., Production Server)"
+                                        value={newKeyName}
+                                        onChange={(e) => setNewKeyName(e.target.value)}
+                                        maxLength={100}
+                                    />
+                                </div>
+                                <Button
+                                    onClick={handleCreateApiKey}
+                                    disabled={isCreatingKey || !newKeyName.trim()}
+                                    className="bg-gradient-primary"
+                                >
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    {isCreatingKey ? "Creating..." : "Create Key"}
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* API Keys List Card */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Your API Keys</CardTitle>
+                            <CardDescription>
+                                Manage your existing API keys. Delete keys that are no longer needed.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <ApiKeysTableClient />
+                        </CardContent>
+                    </Card>
+                </TabsContent>
             </Tabs>
+
+            {/* New API Key Dialog */}
+            <Dialog open={showKeyDialog} onOpenChange={setShowKeyDialog}>
+                <DialogContent className="sm:max-w-[600px]">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2 text-xl">
+                            <Key className="w-5 h-5" />
+                            API Key Created Successfully
+                        </DialogTitle>
+                        <DialogDescription className="text-base pt-2">
+                            Make sure to copy your API key now. You won't be able to see it again!
+                        </DialogDescription>
+                    </DialogHeader>
+                    
+                    <div className="space-y-4 py-4">
+                        <div className="p-4 bg-muted rounded-lg border-2 border-primary/20">
+                            <p className="text-sm font-medium mb-2">Your API Key:</p>
+                            <div className="flex items-center gap-2">
+                                <code className="flex-1 p-3 bg-background rounded border font-mono text-sm break-all">
+                                    {newlyCreatedKey}
+                                </code>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={handleCopyNewKey}
+                                    className="shrink-0"
+                                >
+                                    <Copy className="w-4 h-4" />
+                                </Button>
+                            </div>
+                        </div>
+                        
+                        <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                            <p className="text-sm font-semibold text-destructive mb-1">
+                                ⚠️ Important Security Notice
+                            </p>
+                            <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                                <li>Store this key in a secure location</li>
+                                <li>Never share it or commit it to version control</li>
+                                <li>This key will not be displayed again</li>
+                                <li>If lost, you'll need to create a new one</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button
+                            onClick={handleCloseKeyDialog}
+                            className="bg-gradient-primary"
+                        >
+                            I've saved my key
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
